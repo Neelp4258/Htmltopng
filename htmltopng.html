@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Card to PNG Converter - High DPI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00e5ff;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .section-title {
+            color: #00e5ff;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 15px;
+            background: linear-gradient(135deg, #00bcd4, #00838f);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .file-input-label:active {
+            transform: scale(0.98);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 229, 255, 0.1);
+            border-radius: 5px;
+            font-size: 12px;
+            word-break: break-all;
+            color: #00e5ff;
+        }
+
+        .dpi-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .dpi-option {
+            padding: 12px;
+            background: rgba(0, 188, 212, 0.1);
+            border: 2px solid rgba(0, 188, 212, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .dpi-option.selected {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: #00e5ff;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .dpi-option .dpi-value {
+            font-weight: 700;
+            font-size: 18px;
+            color: #00e5ff;
+            display: block;
+        }
+
+        .dpi-option .dpi-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 3px;
+        }
+
+        .custom-dpi {
+            margin-top: 10px;
+        }
+
+        .custom-dpi input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00e5ff, #00bcd4);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .convert-btn:active {
+            transform: scale(0.98);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00e5ff, #00bcd4);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #00e5ff;
+        }
+
+        .result {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .preview-container {
+            margin-bottom: 15px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .preview-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        .info-box {
+            background: rgba(0, 229, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00e5ff;
+            font-size: 12px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .info-box strong {
+            color: #00e5ff;
+        }
+
+        #renderCanvas {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+        }
+
+        .error {
+            background: rgba(255, 82, 82, 0.2);
+            border: 1px solid rgba(255, 82, 82, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            color: #ff5252;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎴 Business Card to PNG</h1>
+        <div class="subtitle">High-Quality DPI Converter (300-2400 DPI)</div>
+
+        <div class="section">
+            <div class="section-title">📁 Select HTML File</div>
+            <div class="file-input-wrapper">
+                <label for="htmlFile" class="file-input-label">
+                    Choose HTML File
+                </label>
+                <input type="file" id="htmlFile" accept=".html,.htm">
+                <div class="file-name" id="fileName" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🎯 Select DPI Quality</div>
+            <div class="dpi-options">
+                <div class="dpi-option" data-dpi="300">
+                    <span class="dpi-value">300</span>
+                    <span class="dpi-label">Standard Print</span>
+                </div>
+                <div class="dpi-option selected" data-dpi="600">
+                    <span class="dpi-value">600</span>
+                    <span class="dpi-label">High Quality</span>
+                </div>
+                <div class="dpi-option" data-dpi="1200">
+                    <span class="dpi-value">1200</span>
+                    <span class="dpi-label">Professional</span>
+                </div>
+                <div class="dpi-option" data-dpi="2400">
+                    <span class="dpi-value">2400</span>
+                    <span class="dpi-label">Ultra HD</span>
+                </div>
+            </div>
+            <div class="custom-dpi">
+                <input type="number" id="customDpi" placeholder="Or enter custom DPI (100-5000)" min="100" max="5000">
+            </div>
+        </div>
+
+        <div class="section">
+            <button class="convert-btn" id="convertBtn" disabled>Convert to PNG</button>
+            
+            <div class="progress" id="progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing...</div>
+            </div>
+
+            <div class="error" id="error"></div>
+        </div>
+
+        <div class="result" id="result">
+            <div class="section">
+                <div class="section-title">✅ Conversion Complete!</div>
+                <div class="preview-container" id="previewContainer"></div>
+                <button class="download-btn" id="downloadBtn">⬇️ Download PNG</button>
+                <div class="info-box" id="infoBox"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="info-box">
+                <strong>📋 Instructions:</strong><br>
+                1. Select your business card HTML file<br>
+                2. Choose DPI quality (600 recommended for print)<br>
+                3. Click Convert to PNG<br>
+                4. Download your high-quality image<br><br>
+                <strong>Note:</strong> Higher DPI = Larger file size but better quality. Standard business card size is 3.5" × 2".
+            </div>
+        </div>
+    </div>
+
+    <canvas id="renderCanvas"></canvas>
+
+    <script>
+        let selectedFile = null;
+        let selectedDpi = 600;
+        let convertedImage = null;
+
+        // File input handling
+        document.getElementById('htmlFile').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                document.getElementById('fileName').textContent = selectedFile.name;
+                document.getElementById('fileName').style.display = 'block';
+                updateConvertButton();
+            }
+        });
+
+        // DPI option selection
+        document.querySelectorAll('.dpi-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.dpi-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedDpi = parseInt(this.getAttribute('data-dpi'));
+                document.getElementById('customDpi').value = '';
+            });
+        });
+
+        // Custom DPI input
+        document.getElementById('customDpi').addEventListener('input', function() {
+            if (this.value) {
+                document.querySelectorAll('.dpi-option').forEach(opt => opt.classList.remove('selected'));
+                selectedDpi = parseInt(this.value) || 600;
+            }
+        });
+
+        // Update convert button state
+        function updateConvertButton() {
+            document.getElementById('convertBtn').disabled = !selectedFile;
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update progress
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        // Convert HTML to PNG
+        document.getElementById('convertBtn').addEventListener('click', async function() {
+            if (!selectedFile) {
+                showError('Please select an HTML file first');
+                return;
+            }
+
+            try {
+                // Show progress
+                document.getElementById('progress').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
+                updateProgress(10, 'Reading HTML file...');
+
+                // Read HTML file
+                const htmlContent = await selectedFile.text();
+                updateProgress(30, 'Parsing HTML...');
+
+                // Business card dimensions in inches
+                const cardWidthInches = 3.5;
+                const cardHeightInches = 2.0;
+
+                // Calculate pixel dimensions based on DPI
+                const width = Math.round(cardWidthInches * selectedDpi);
+                const height = Math.round(cardHeightInches * selectedDpi);
+
+                updateProgress(40, 'Creating canvas...');
+
+                // Load html2canvas if not loaded
+                if (!window.html2canvas) {
+                    await loadHtml2Canvas();
+                }
+
+                // Create a container div with exact dimensions
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-99999px';
+                container.style.top = '0';
+                container.style.width = (cardWidthInches * 96) + 'px'; // 96 DPI base
+                container.style.height = (cardHeightInches * 96) + 'px';
+                container.innerHTML = htmlContent;
+                document.body.appendChild(container);
+
+                updateProgress(50, 'Rendering HTML...');
+
+                // Wait for any images/fonts to load
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                updateProgress(70, 'Capturing image...');
+
+                // Find the card element
+                const cardElement = container.querySelector('.card') || container.querySelector('body') || container;
+
+                // Capture with html2canvas
+                const canvas = await html2canvas(cardElement, {
+                    width: cardWidthInches * 96,
+                    height: cardHeightInches * 96,
+                    scale: selectedDpi / 96,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null,
+                    logging: false,
+                    windowWidth: cardWidthInches * 96,
+                    windowHeight: cardHeightInches * 96
+                });
+
+                updateProgress(90, 'Finalizing...');
+
+                // Clean up
+                document.body.removeChild(container);
+
+                // Convert canvas to blob
+                const blob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/png', 1.0);
+                });
+
+                convertedImage = blob;
+
+                // Create preview
+                const previewUrl = URL.createObjectURL(blob);
+                const previewImg = document.createElement('img');
+                previewImg.src = previewUrl;
+                document.getElementById('previewContainer').innerHTML = '';
+                document.getElementById('previewContainer').appendChild(previewImg);
+
+                // Show file info
+                const fileSizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('infoBox').innerHTML = `
+                    <strong>Image Details:</strong><br>
+                    Resolution: ${width} × ${height} pixels<br>
+                    DPI: ${selectedDpi}<br>
+                    File Size: ${fileSizeMB} MB<br>
+                    Format: PNG (Lossless)
+                `;
+
+                updateProgress(100, 'Complete!');
+                document.getElementById('progress').style.display = 'none';
+                document.getElementById('result').style.display = 'block';
+
+            } catch (error) {
+                console.error('Conversion error:', error);
+                showError('Conversion failed: ' + error.message);
+                document.getElementById('progress').style.display = 'none';
+            }
+        });
+
+        // Download button
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            if (!convertedImage) {
+                showError('No image to download');
+                return;
+            }
+
+            const url = URL.createObjectURL(convertedImage);
+            const a = document.createElement('a');
+            a.href = url;
+            const fileName = selectedFile.name.replace('.html', '') + `_${selectedDpi}dpi.png`;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // html2canvas library from CDN - will be loaded dynamically
+        function loadHtml2Canvas() {
+            return new Promise((resolve, reject) => {
+                if (window.html2canvas) {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Preload html2canvas on page load
+        window.addEventListener('load', function() {
+            loadHtml2Canvas().catch(function(error) {
+                console.error('Failed to load html2canvas:', error);
+            });
+        });
+    </script>
+</body>
+</html>
